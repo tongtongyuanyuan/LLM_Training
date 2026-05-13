@@ -1,0 +1,37 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.env
+*.egg-info/
+
+# Large data files — generate with data_process.py
+train.json
+dev.json
+alpaca_zh_medical.json
+
+# Large archives and partial downloads
+*.zip
+*.baiduyun.p.downloading
+
+# Cloned training repo — users clone this themselves
+ChatGLM2-6B/
+
+# Medical dialogue raw data (large CSVs)
+Chinese-medical-dialogue/
+
+# Model weights and checkpoints (too large for git)
+output/
+saves/
+*.bin
+*.safetensors
+*.pt
+Qwen3-*/
+ZhipuAI/
+
+# Course PDFs and unrelated files
+*.pdf
+rl_utils.py
