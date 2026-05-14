@@ -8,10 +8,9 @@ __pycache__/
 .env
 *.egg-info/
 
-# Large data files — generate with data_process.py
+# Generated split files — created by data_process.py
 train.json
 dev.json
-alpaca_zh_medical.json
 
 # Large archives and partial downloads
 *.zip
