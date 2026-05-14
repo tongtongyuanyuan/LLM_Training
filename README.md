@@ -17,7 +17,7 @@ Practice project for PEFT (Parameter-Efficient Fine-Tuning) on Chinese medical d
 ## Project Layout
 
 ```
-LLM_HW/
+LLM_Training/                        (repo root)
 ├── README.md
 ├── CLAUDE.md                        project notes
 ├── ptuning_v2/                      Part 1 — ChatGLM3 P-Tuning v2
@@ -48,6 +48,16 @@ cd LLM_Training
 
 ### 2. Install base dependencies
 
+> **If pip is slow or times out on RunPod**, add a mirror with `-i`:
+>
+> ```bash
+> # 清华源 (recommended)
+> pip install modelscope -i https://pypi.tuna.tsinghua.edu.cn/simple
+>
+> # 阿里源 (backup)
+> pip install modelscope -i https://mirrors.aliyun.com/pypi/simple
+> ```
+
 ```bash
 pip install modelscope
 ```
@@ -65,8 +75,14 @@ Uses the [ChatGLM2-6B](https://github.com/THUDM/ChatGLM2-6B) training scripts wi
 ### Dependencies
 
 ```bash
-pip install datasets==4.4.1 transformers==4.30.2 \
+# Normal install
+pip install modelscope datasets==4.4.1 transformers==4.30.2 \
             jieba rouge-chinese nltk sentencepiece accelerate
+
+# If download times out on RunPod, add mirror:
+pip install modelscope datasets==4.4.1 transformers==4.30.2 \
+            jieba rouge-chinese nltk sentencepiece accelerate \
+            -i https://pypi.tuna.tsinghua.edu.cn/simple
 ```
 
 ### Step-by-step commands
