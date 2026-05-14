@@ -137,6 +137,29 @@ def patch_modeling(repo_dir):
     return True
 
 
+def patch_main(repo_dir):
+    """
+    Remove the deprecated `use_auth_token` kwarg from load_dataset() in main.py.
+    Datasets >= 3.0 removed this parameter — passing it causes a TypeError.
+    """
+    path = os.path.join(repo_dir, "ptuning", "main.py")
+    if not os.path.exists(path):
+        print(f"[SKIP] Not found: {path}")
+        return
+
+    text = open(path, encoding="utf-8").read()
+
+    if "use_auth_token" not in text:
+        print("[SKIP] use_auth_token not found in main.py (already clean)")
+        return
+
+    # Remove the use_auth_token= line from load_dataset() call
+    import re
+    patched = re.sub(r'\s*use_auth_token\s*=\s*[^\n,]+,?\n', '\n', text)
+    open(path, "w", encoding="utf-8").write(patched)
+    print("[OK]   Removed use_auth_token from main.py (datasets >= 3.0 compatibility)")
+
+
 def write_train_sh(repo_dir, model_path, train_file, dev_file):
     """Write a ready-to-run train.sh into ChatGLM2-6B/ptuning/."""
     ptuning_dir = os.path.join(repo_dir, "ptuning")
@@ -201,6 +224,7 @@ def main():
     print(f"\n=== Patching {args.repo_dir} ===")
     patch_tokenization(args.repo_dir)
     patch_modeling(args.repo_dir)
+    patch_main(args.repo_dir)
     write_train_sh(args.repo_dir, args.model_path, args.train_file, args.dev_file)
 
     print(f"""
@@ -210,7 +234,7 @@ def main():
   cd {args.repo_dir}/ptuning
 
   # Step 7 – install packages
-  pip install datasets==4.4.1 transformers==4.30.2 \\
+  pip install datasets==2.14.6 transformers==4.30.2 \\
               nltk sentencepiece accelerate
 
   # Step 8 – start training
