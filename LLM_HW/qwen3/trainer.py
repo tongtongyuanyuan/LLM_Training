@@ -190,21 +190,44 @@ class Qwen3_8B_QLoRA(BaseQwen3Trainer):
 
 
 class Qwen3_32B_LoRA(BaseQwen3Trainer):
-    """Qwen3-32B  +  LoRA  (requires multi-GPU or CPU offload — tight on single 4090)."""
-    model_id  = "Qwen/Qwen3-32B"
-    model_dir = "Qwen3-32B"
-    lora_rank = 8
-    cutoff_len = 512        # shorter sequence to reduce activation memory
-    gradient_accumulation_steps = 16
-    gradient_checkpointing = True
+    """Qwen3-32B  +  LoRA.
 
-
-class Qwen3_32B_QLoRA(BaseQwen3Trainer):
-    """Qwen3-32B  +  QLoRA 4-bit  (base model ~16 GB — feasible on single 4090 with care)."""
+    WARNING: bf16 base model = ~64 GB — does NOT fit on a single RTX 4090 (24 GB).
+    Requires at least 2× A100 80 GB or equivalent.
+    """
     model_id  = "Qwen/Qwen3-32B"
     model_dir = "Qwen3-32B"
     lora_rank = 8
     cutoff_len = 512
+    gradient_accumulation_steps = 16
+    gradient_checkpointing = True
+
+    def train(self):
+        import sys
+        print(
+            "\n[WARNING] Qwen3-32B LoRA requires ~64 GB VRAM (bf16 weights).\n"
+            "A single RTX 4090 (24 GB) is NOT enough.\n"
+            "Recommended: 2× A100 80 GB or H100 80 GB on RunPod.\n"
+            "Use Qwen3_32B_QLoRA for a single 4090 (still very tight).\n"
+        )
+        confirm = input("Continue anyway? [y/N] ").strip().lower()
+        if confirm != "y":
+            sys.exit(0)
+        super().train()
+
+
+class Qwen3_32B_QLoRA(BaseQwen3Trainer):
+    """Qwen3-32B  +  QLoRA 4-bit.
+
+    4-bit weights = ~16 GB.  With activations + optimizer states ≈ 21-23 GB total.
+    Single RTX 4090 (24 GB): possible but extremely tight — OOM risk is real.
+    Recommended GPU: 2× RTX 4090 (48 GB) or 1× A100/H100 80 GB.
+    cutoff_len is set to 256 (not 512) to leave maximum headroom.
+    """
+    model_id  = "Qwen/Qwen3-32B"
+    model_dir = "Qwen3-32B"
+    lora_rank = 8
+    cutoff_len = 256        # reduced from 512 — critical for single-GPU survival
     gradient_accumulation_steps = 16
     quantization_bit = 4
     gradient_checkpointing = True

@@ -2,12 +2,15 @@
 
 Practice project for PEFT (Parameter-Efficient Fine-Tuning) on Chinese medical dialogue data.
 
-| Part | Model | Method | GPU (min) |
-|------|-------|--------|-----------|
-| 1 | ChatGLM3-6B-32K (Zhipu AI) | P-Tuning v2 | 24 GB |
-| 2 | Qwen3-8B (Alibaba) | LoRA | 16 GB |
-| 3 | Qwen3-8B (Alibaba) | QLoRA 4-bit | 10 GB |
-| 4 | Qwen3-32B (Alibaba) | QLoRA 4-bit | ~20 GB |
+| Part | Model | Method | VRAM needed | Single RTX 4090 (24 GB) |
+|------|-------|--------|-------------|------------------------|
+| 1 | ChatGLM3-6B-32K | P-Tuning v2 | ~8 GB | ✅ 没问题 |
+| 2 | Qwen3-8B | LoRA (bf16) | ~16 GB | ✅ 够用 |
+| 3 | Qwen3-8B | QLoRA 4-bit | ~10 GB | ✅ 轻松 |
+| 4 | Qwen3-32B | QLoRA 4-bit | ~21–23 GB | ⚠️ 极限，OOM风险大 |
+| — | Qwen3-32B | LoRA (bf16) | ~64 GB | ❌ 放不下 |
+
+> **32B 推荐配置**：RunPod 2× RTX 4090 (48 GB) 或 1× A100/H100 80 GB
 
 ---
 
@@ -195,8 +198,9 @@ python run.py Qwen3_8B_QLoRA export
 
 ## Part 4 — Qwen3-32B with QLoRA (4-bit)
 
-> Requires RunPod RTX 4090 (24 GB).
-> 32B model in 4-bit ≈ 16 GB; leave headroom with shorter sequences.
+> **GPU requirement**: 2× RTX 4090 (48 GB) or 1× A100/H100 (80 GB) recommended.
+> Single 4090 is very risky — 4-bit weights alone = 16 GB, plus activations pushes to 21-23 GB.
+> `cutoff_len` is set to 256 to give maximum headroom on a single GPU.
 
 ```bash
 cd qwen3
