@@ -6,15 +6,26 @@ Each disease record generates multiple QA pairs covering:
   - description, symptoms, cause, prevention, department, cure_way, check, drugs
 """
 
+import argparse
 import json
 import random
 import os
 
-MEDICAL_JSON_PATH = (
+_DEFAULT_INPUT = (
     "/Users/tongxue/Desktop/AI/AI_Course/三期课程/"
     "知识图谱day16/作业/medicalGraph/medical.json/medical.json"
 )
-OUTPUT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+def _parse_args():
+    p = argparse.ArgumentParser()
+    p.add_argument("--input",      default=_DEFAULT_INPUT,  help="path to medical.json")
+    p.add_argument("--output_dir", default="/hy-tmp",       help="directory for train.json / dev.json")
+    return p.parse_args()
+
+_args = _parse_args()
+MEDICAL_JSON_PATH = _args.input
+OUTPUT_DIR        = _args.output_dir
+os.makedirs(OUTPUT_DIR, exist_ok=True)
 TRAIN_PATH = os.path.join(OUTPUT_DIR, "train.json")
 DEV_PATH   = os.path.join(OUTPUT_DIR, "dev.json")
 
